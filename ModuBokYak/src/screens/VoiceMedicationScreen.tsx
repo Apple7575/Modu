@@ -14,6 +14,8 @@ import Sound from 'react-native-sound';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../navigation/AppNavigator';
 import AudioWaveform from '../components/AudioWaveform';
+import TypingBubble from '../components/TypingBubble';
+import UserListeningBubble from '../components/UserListeningBubble';
 import { colors, shadows, spacing, radius, typography } from '../theme';
 
 Sound.setCategory('Playback');
@@ -27,7 +29,7 @@ type Stage =
   | 'confirm_health'  // voice5 재생 중
   | 'done';
 
-type ChatMsg = { id: string; type: 'ai' | 'user'; text: string };
+type ChatMsg = { id: string; type: 'ai' | 'user' | 'user_listening'; text: string };
 
 const HEALTH_OPTIONS = [
   { id: 'good', icon: 'emoticon-happy-outline', label: '괜찮아요', color: colors.status.success, bg: '#ECFDF5' },
@@ -46,7 +48,7 @@ export default function VoiceMedicationScreen({ navigation }: Props) {
   const [isPlaying, setIsPlaying] = useState(true);
   const [tookMedicine, setTookMedicine] = useState(false);
   const [messages, setMessages] = useState<ChatMsg[]>([
-    { id: '0', type: 'ai', text: '최미경님, 아침 약 드실 시간입니다.\n약 드셨다면 말씀해주세요.' },
+    { id: '0', type: 'ai', text: '안연일님, 아침 약 드실 시간입니다.\n약 드셨다면 말씀해주세요.' },
   ]);
 
   const mountedRef = useRef(true);
@@ -128,8 +130,7 @@ export default function VoiceMedicationScreen({ navigation }: Props) {
     setTookMedicine(true);
     hideFooter(() => {
       if (!mountedRef.current) return;
-      // voice2 시작과 동시에 '네, 먹었어요' 메시지 표시
-      pushMsg({ type: 'user', text: '네, 먹었어요' });
+      pushMsg({ type: 'user_listening', text: '네, 먹었어요' });
       setStage('confirm_took');
       setIsPlaying(true);
 
@@ -137,16 +138,14 @@ export default function VoiceMedicationScreen({ navigation }: Props) {
         if (!mountedRef.current) return;
         addTimer(() => {
           if (!mountedRef.current) return;
-          // voice3 시작과 동시에 첫 번째 문장 표시
           pushMsg({ type: 'ai', text: '오늘 복용이 확인되었습니다.' });
-          // 2초 후 두 번째 문장 표시 (voice3 내 두 번째 문장 타이밍)
-          addTimer(() => {
-            if (!mountedRef.current) return;
-            pushMsg({ type: 'ai', text: '오늘 몸 상태는 어떠신가요?' });
-          }, 2000);
           playSound('voice3.mp3', () => {
             if (!mountedRef.current) return;
-            startHealthStage();
+            pushMsg({ type: 'ai', text: '오늘 몸 상태는 어떠신가요?' });
+            playSound('voice3b.mp3', () => {
+              if (!mountedRef.current) return;
+              startHealthStage();
+            });
           });
         }, 500);
       });
@@ -158,7 +157,7 @@ export default function VoiceMedicationScreen({ navigation }: Props) {
     setTookMedicine(false);
     hideFooter(() => {
       if (!mountedRef.current) return;
-      pushMsg({ type: 'user', text: '아직 안 먹었어요' });
+      pushMsg({ type: 'user_listening', text: '아직 안 먹었어요' });
       addTimer(() => {
         if (!mountedRef.current) return;
         pushMsg({ type: 'ai', text: '오늘 몸 상태는 어떠신가요?' });
@@ -171,7 +170,7 @@ export default function VoiceMedicationScreen({ navigation }: Props) {
   const handleHealthSelect = (opt: typeof HEALTH_OPTIONS[0]) => {
     if (stage !== 'pick_health') return;
     Animated.timing(gridFade, { toValue: 0, duration: 200, useNativeDriver: true }).start();
-    pushMsg({ type: 'user', text: opt.label });
+    pushMsg({ type: 'user_listening', text: opt.label });
     setStage('confirm_health');
     setIsPlaying(true);
 
@@ -231,11 +230,9 @@ export default function VoiceMedicationScreen({ navigation }: Props) {
         onContentSizeChange={scrollBottom}>
         {messages.map(msg =>
           msg.type === 'ai' ? (
-            <View key={msg.id} style={styles.aiBubbleWrap}>
-              <View style={styles.aiBubble}>
-                <Text style={styles.aiBubbleText}>{msg.text}</Text>
-              </View>
-            </View>
+            <TypingBubble key={msg.id} text={msg.text} />
+          ) : msg.type === 'user_listening' ? (
+            <UserListeningBubble key={msg.id} text={msg.text} />
           ) : (
             <View key={msg.id} style={styles.userBubbleWrap}>
               <View style={styles.userBubble}>

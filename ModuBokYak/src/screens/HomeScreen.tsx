@@ -13,6 +13,7 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {RootStackParamList} from '../navigation/AppNavigator';
 import {colors, shadows, spacing, radius, typography} from '../theme';
+import CircularProgress from '../components/CircularProgress';
 
 type Props = {
   navigation: StackNavigationProp<RootStackParamList, 'Home'>;
@@ -49,13 +50,10 @@ export default function HomeScreen({navigation}: Props) {
         showsVerticalScrollIndicator={false}>
         {/* 복약 현황 카드 */}
         <View style={styles.card}>
-          <Text style={styles.statusDate}>2026년 4월 27일 일요일</Text>
-          <Text style={styles.statusName}>최미경님의 오늘 복약 현황</Text>
-          <View style={styles.progressRow}>
-            <View style={styles.progressBg}>
-              <View style={[styles.progressFill, {width: '85%'}]} />
-            </View>
-            <Text style={styles.progressText}>85%</Text>
+          <Text style={styles.statusDate}>2026년 4월 29일 화요일</Text>
+          <Text style={styles.statusName}>안연일님의 오늘 복약 현황</Text>
+          <View style={styles.progressCenter}>
+            <CircularProgress percent={85} size={130} strokeWidth={11} />
           </View>
           <Text style={styles.sectionLabel}>오늘의 복약 기록</Text>
           <View style={styles.medicineRow}>
@@ -103,6 +101,23 @@ export default function HomeScreen({navigation}: Props) {
             <Icon name="microphone" size={24} color={colors.text.white} />
             <Text style={styles.startButtonText} numberOfLines={1}>
               음성 복약 관리 시작
+            </Text>
+            <Icon name="chevron-right" size={22} color="rgba(255,255,255,0.7)" />
+          </LinearGradient>
+        </TouchableOpacity>
+
+        {/* 알람 설정 버튼 */}
+        <TouchableOpacity
+          activeOpacity={0.85}
+          onPress={() => navigation.navigate('AlarmSetup')}>
+          <LinearGradient
+            colors={['#059669', '#10B981']}
+            start={{x: 0, y: 0}}
+            end={{x: 1, y: 0}}
+            style={styles.startButton}>
+            <Icon name="alarm-plus" size={24} color={colors.text.white} />
+            <Text style={styles.startButtonText} numberOfLines={1}>
+              음성 AI 복약 알람 설정하기
             </Text>
             <Icon name="chevron-right" size={22} color="rgba(255,255,255,0.7)" />
           </LinearGradient>
@@ -166,29 +181,9 @@ const styles = StyleSheet.create({
     color: colors.text.primary,
     marginBottom: spacing.md,
   },
-  progressRow: {
-    flexDirection: 'row',
+  progressCenter: {
     alignItems: 'center',
-    gap: spacing.sm,
-    marginBottom: spacing.base,
-  },
-  progressBg: {
-    flex: 1,
-    height: 9,
-    backgroundColor: colors.borderLight,
-    borderRadius: radius.full,
-    overflow: 'hidden',
-  },
-  progressFill: {
-    height: 9,
-    backgroundColor: colors.primary,
-    borderRadius: radius.full,
-  },
-  progressText: {
-    ...typography.smallBold,
-    color: colors.primary,
-    minWidth: 38,
-    textAlign: 'right',
+    paddingVertical: spacing.lg,
   },
   sectionLabel: {
     ...typography.small,

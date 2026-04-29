@@ -11,6 +11,11 @@
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13FEA035AB49467A9CDD4E6B /* voice4.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 9D413CA264494F158D1FF723 /* voice4.mp3 */; };
 		30BB7C0B986049AEBD85EB8E /* voice1.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 2EEE9446C1934A159D3C08E5 /* voice1.mp3 */; };
+		AA001100BB22CC33DD44EE55 /* alarm_voice1.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = AA001100BB22CC33DD44EE56 /* alarm_voice1.mp3 */; };
+		BB001100CC22DD33EE44FF55 /* voice3b.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = BB001100CC22DD33EE44FF56 /* voice3b.mp3 */; };
+		AA001100BB22CC33DD44EE57 /* alarm_voice2.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = AA001100BB22CC33DD44EE58 /* alarm_voice2.mp3 */; };
+		AA001100BB22CC33DD44EE59 /* alarm_voice3.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = AA001100BB22CC33DD44EE5A /* alarm_voice3.mp3 */; };
+		AA001100BB22CC33DD44EE5B /* alarm_voice4.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = AA001100BB22CC33DD44EE5C /* alarm_voice4.mp3 */; };
 		761780ED2CA45674006654EE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 761780EC2CA45674006654EE /* AppDelegate.swift */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 		897E056F783F4A448E5C2C89 /* voice5.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 490B172A85564AFC9EA9246F /* voice5.mp3 */; };
@@ -22,6 +27,11 @@
 
 /* Begin PBXFileReference section */
 		067C1E0A199B4A29B2C36579 /* voice3.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = voice3.mp3; path = ModuBokYak/voice3.mp3; sourceTree = "<group>"; };
+		AA001100BB22CC33DD44EE56 /* alarm_voice1.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = alarm_voice1.mp3; path = ModuBokYak/alarm_voice1.mp3; sourceTree = "<group>"; };
+		BB001100CC22DD33EE44FF56 /* voice3b.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = voice3b.mp3; path = ModuBokYak/voice3b.mp3; sourceTree = "<group>"; };
+		AA001100BB22CC33DD44EE58 /* alarm_voice2.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = alarm_voice2.mp3; path = ModuBokYak/alarm_voice2.mp3; sourceTree = "<group>"; };
+		AA001100BB22CC33DD44EE5A /* alarm_voice3.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = alarm_voice3.mp3; path = ModuBokYak/alarm_voice3.mp3; sourceTree = "<group>"; };
+		AA001100BB22CC33DD44EE5C /* alarm_voice4.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = alarm_voice4.mp3; path = ModuBokYak/alarm_voice4.mp3; sourceTree = "<group>"; };
 		13B07F961A680F5B00A75B9A /* ModuBokYak.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ModuBokYak.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = ModuBokYak/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = ModuBokYak/Info.plist; sourceTree = "<group>"; };
@@ -65,6 +75,11 @@
 				067C1E0A199B4A29B2C36579 /* voice3.mp3 */,
 				9D413CA264494F158D1FF723 /* voice4.mp3 */,
 				490B172A85564AFC9EA9246F /* voice5.mp3 */,
+				BB001100CC22DD33EE44FF56 /* voice3b.mp3 */,
+				AA001100BB22CC33DD44EE56 /* alarm_voice1.mp3 */,
+				AA001100BB22CC33DD44EE58 /* alarm_voice2.mp3 */,
+				AA001100BB22CC33DD44EE5A /* alarm_voice3.mp3 */,
+				AA001100BB22CC33DD44EE5C /* alarm_voice4.mp3 */,
 			);
 			name = ModuBokYak;
 			sourceTree = "<group>";
@@ -183,6 +198,11 @@
 				FE2F1C90A1A245DFAB3A7A0B /* voice3.mp3 in Resources */,
 				13FEA035AB49467A9CDD4E6B /* voice4.mp3 in Resources */,
 				897E056F783F4A448E5C2C89 /* voice5.mp3 in Resources */,
+				BB001100CC22DD33EE44FF55 /* voice3b.mp3 in Resources */,
+				AA001100BB22CC33DD44EE55 /* alarm_voice1.mp3 in Resources */,
+				AA001100BB22CC33DD44EE57 /* alarm_voice2.mp3 in Resources */,
+				AA001100BB22CC33DD44EE59 /* alarm_voice3.mp3 in Resources */,
+				AA001100BB22CC33DD44EE5B /* alarm_voice4.mp3 in Resources */,
 				9575D4B697937668BA3A5BDB /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
