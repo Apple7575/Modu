@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, {useEffect, useRef} from 'react';
 import {
   View,
   Text,
@@ -9,22 +9,30 @@ import {
   Animated,
   Easing,
 } from 'react-native';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { RouteProp } from '@react-navigation/native';
-import { RootStackParamList } from '../navigation/AppNavigator';
+import LinearGradient from 'react-native-linear-gradient';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import {StackNavigationProp} from '@react-navigation/stack';
+import {RouteProp} from '@react-navigation/native';
+import {RootStackParamList} from '../navigation/AppNavigator';
+import {colors, shadows, spacing, radius, typography} from '../theme';
 
 type Props = {
   navigation: StackNavigationProp<RootStackParamList, 'Completion'>;
   route: RouteProp<RootStackParamList, 'Completion'>;
 };
 
-export default function CompletionScreen({ navigation, route }: Props) {
-  const { tookMedicine, healthStatus } = route.params;
+export default function CompletionScreen({navigation, route}: Props) {
+  const {tookMedicine, healthStatus} = route.params;
   const scaleAnim = useRef(new Animated.Value(0)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(20)).current;
 
   const now = new Date();
-  const timeStr = `오전 ${now.getHours() < 12 ? now.getHours() : now.getHours() - 12}:${String(now.getMinutes()).padStart(2, '0')}`;
+  const hours = now.getHours();
+  const minutes = String(now.getMinutes()).padStart(2, '0');
+  const isPM = hours >= 12;
+  const displayHour = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours;
+  const timeStr = `${isPM ? '오후' : '오전'} ${displayHour}:${minutes}`;
 
   useEffect(() => {
     Animated.parallel([
@@ -40,69 +48,97 @@ export default function CompletionScreen({ navigation, route }: Props) {
         easing: Easing.ease,
         useNativeDriver: true,
       }),
+      Animated.timing(slideAnim, {
+        toValue: 0,
+        duration: 500,
+        easing: Easing.out(Easing.ease),
+        useNativeDriver: true,
+      }),
     ]).start();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const statusColor = tookMedicine ? colors.status.success : colors.status.warning;
+  const statusBg = tookMedicine ? '#ECFDF5' : '#FFFBEB';
+  const statusBorder = tookMedicine ? colors.status.success : colors.status.warning;
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scroll}>
-        {/* 완료 아이콘 */}
+      <ScrollView
+        contentContainerStyle={styles.scroll}
+        showsVerticalScrollIndicator={false}>
         <Animated.View
-          style={[styles.iconWrap, { transform: [{ scale: scaleAnim }] }]}>
-          <View style={[styles.iconCircle, !tookMedicine && styles.iconCircleWarn]}>
-            <Text style={styles.iconText}>{tookMedicine ? '✅' : '⚠️'}</Text>
+          style={[styles.iconWrap, {transform: [{scale: scaleAnim}]}]}>
+          <View
+            style={[
+              styles.iconCircle,
+              {backgroundColor: statusBg, borderColor: statusBorder},
+            ]}>
+            <Icon
+              name={tookMedicine ? 'check-circle' : 'alert-circle'}
+              size={48}
+              color={statusColor}
+            />
           </View>
         </Animated.View>
 
-        <Animated.View style={{ opacity: fadeAnim, alignItems: 'center' }}>
-          <Text style={[styles.title, !tookMedicine && styles.titleWarn]}>
+        <Animated.View
+          style={[
+            styles.content,
+            {opacity: fadeAnim, transform: [{translateY: slideAnim}]},
+          ]}>
+          <Text style={[styles.title, {color: statusColor}]}>
             {tookMedicine ? '복약 완료' : '복약 미완료'}
           </Text>
           <Text style={styles.subtitle}>건강 상태 기록 완료</Text>
 
-          {/* 리포트 카드 */}
           <View style={styles.reportCard}>
             <View style={styles.reportHeader}>
-              <Text style={styles.reportHeaderIcon}>📋</Text>
+              <View style={styles.reportHeaderIconWrap}>
+                <Icon name="clipboard-text-outline" size={18} color={colors.primary} />
+              </View>
               <Text style={styles.reportHeaderText}>오늘의 복약 리포트</Text>
             </View>
             <View style={styles.divider} />
 
-            <View style={styles.reportRow}>
-              <Text style={styles.reportLabel}>복약 여부</Text>
-              <Text
-                style={[
-                  styles.reportValue,
-                  tookMedicine ? styles.valueGreen : styles.valueRed,
-                ]}>
-                {tookMedicine ? '✅ 완료' : '❌ 미완료'}
-              </Text>
-            </View>
+            <ReportRow label="복약 여부">
+              <View style={styles.reportValueRow}>
+                <Icon
+                  name={tookMedicine ? 'check-circle' : 'close-circle'}
+                  size={14}
+                  color={tookMedicine ? colors.status.success : colors.status.error}
+                />
+                <Text
+                  style={[
+                    styles.reportValue,
+                    {color: tookMedicine ? colors.status.success : colors.status.error},
+                  ]}>
+                  {' '}{tookMedicine ? '완료' : '미완료'}
+                </Text>
+              </View>
+            </ReportRow>
 
-            <View style={styles.reportRow}>
-              <Text style={styles.reportLabel}>기록 시간</Text>
+            <ReportRow label="기록 시간">
               <Text style={styles.reportValue}>{timeStr}</Text>
-            </View>
+            </ReportRow>
 
-            <View style={styles.reportRow}>
-              <Text style={styles.reportLabel}>복용 약</Text>
+            <ReportRow label="복용 약">
               <Text style={styles.reportValue}>혈압약, 당뇨약</Text>
-            </View>
+            </ReportRow>
 
-            <View style={styles.reportRow}>
-              <Text style={styles.reportLabel}>건강 상태</Text>
+            <ReportRow label="건강 상태">
               <Text style={styles.reportValue}>{healthStatus}</Text>
-            </View>
+            </ReportRow>
 
-            <View style={[styles.reportRow, { borderBottomWidth: 0 }]}>
-              <Text style={styles.reportLabel}>담당 의료진</Text>
+            <ReportRow label="담당 의료진" isLast>
               <Text style={styles.reportValue}>김현우 의사 (내과)</Text>
-            </View>
+            </ReportRow>
           </View>
 
-          {/* 의료진 전달 배너 */}
           <View style={styles.transmitBanner}>
-            <Text style={styles.transmitIcon}>📡</Text>
+            <View style={styles.transmitIconWrap}>
+              <Icon name="broadcast" size={22} color={colors.primary} />
+            </View>
             <View style={styles.transmitTextArea}>
               <Text style={styles.transmitTitle}>
                 이 데이터가 의료진에게 전달됩니다
@@ -113,28 +149,32 @@ export default function CompletionScreen({ navigation, route }: Props) {
             </View>
           </View>
 
-          {/* 의료진 확인 */}
-          <View style={styles.doctorConfirmCard}>
-            <View style={styles.doctorRow}>
-              <View style={styles.doctorAvatar}>
-                <Text style={styles.doctorAvatarText}>👨‍⚕️</Text>
-              </View>
-              <View style={styles.doctorInfo}>
-                <Text style={styles.doctorName}>김현우 의사 (내과)</Text>
-                <Text style={styles.doctorStatus}>
-                  ✓ 리포트 수신 완료 · 서울 케어 병원
-                </Text>
+          <View style={styles.doctorCard}>
+            <View style={styles.doctorAvatarWrap}>
+              <Icon name="stethoscope" size={22} color={colors.primary} />
+            </View>
+            <View style={styles.doctorInfo}>
+              <Text style={styles.doctorName}>김현우 의사 (내과)</Text>
+              <View style={styles.doctorStatusRow}>
+                <Icon name="check-circle" size={12} color={colors.status.success} />
+                <Text style={styles.doctorStatus}> 리포트 수신 완료 · 서울 케어 병원</Text>
               </View>
             </View>
           </View>
 
-          {/* 홈으로 버튼 */}
           <TouchableOpacity
-            style={styles.homeButton}
+            activeOpacity={0.85}
             onPress={() =>
-              navigation.reset({ index: 0, routes: [{ name: 'Home' }] })
+              navigation.reset({index: 0, routes: [{name: 'Home'}]})
             }>
-            <Text style={styles.homeButtonText}>홈으로 돌아가기</Text>
+            <LinearGradient
+              colors={[colors.primary, colors.primaryLight]}
+              start={{x: 0, y: 0}}
+              end={{x: 1, y: 0}}
+              style={styles.homeButton}>
+              <Icon name="home-outline" size={20} color={colors.text.white} />
+              <Text style={styles.homeButtonText}>홈으로 돌아가기</Text>
+            </LinearGradient>
           </TouchableOpacity>
         </Animated.View>
       </ScrollView>
@@ -142,189 +182,194 @@ export default function CompletionScreen({ navigation, route }: Props) {
   );
 }
 
+function ReportRow({
+  label,
+  children,
+  isLast,
+}: {
+  label: string;
+  children: React.ReactNode;
+  isLast?: boolean;
+}) {
+  return (
+    <View style={[reportRowStyles.row, isLast && {borderBottomWidth: 0}]}>
+      <Text style={reportRowStyles.label}>{label}</Text>
+      {children}
+    </View>
+  );
+}
+
+const reportRowStyles = StyleSheet.create({
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: spacing.sm + 2,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.borderLight,
+  },
+  label: {
+    ...typography.small,
+    color: colors.text.secondary,
+  },
+});
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8FAFC',
+    backgroundColor: colors.background,
   },
   scroll: {
-    paddingBottom: 40,
+    paddingBottom: 48,
     alignItems: 'center',
-    paddingTop: 30,
-    paddingHorizontal: 20,
+    paddingTop: 36,
+    paddingHorizontal: spacing.lg,
   },
   iconWrap: {
-    marginBottom: 16,
+    marginBottom: spacing.base,
   },
   iconCircle: {
-    width: 90,
-    height: 90,
-    borderRadius: 45,
-    backgroundColor: '#ECFDF5',
+    width: 96,
+    height: 96,
+    borderRadius: radius.full,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 3,
-    borderColor: '#10B981',
   },
-  iconCircleWarn: {
-    backgroundColor: '#FFFBEB',
-    borderColor: '#F59E0B',
-  },
-  iconText: {
-    fontSize: 40,
+  content: {
+    width: '100%',
+    alignItems: 'center',
   },
   title: {
-    fontSize: 26,
-    fontWeight: '800',
-    color: '#10B981',
-    marginBottom: 6,
-  },
-  titleWarn: {
-    color: '#F59E0B',
+    ...typography.h1,
+    marginBottom: spacing.xs,
   },
   subtitle: {
-    fontSize: 15,
-    color: '#64748B',
-    marginBottom: 24,
+    ...typography.body,
+    color: colors.text.secondary,
+    marginBottom: spacing.xl,
   },
   reportCard: {
     width: '100%',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 16,
-    padding: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.07,
-    shadowRadius: 10,
-    elevation: 3,
-    marginBottom: 16,
+    backgroundColor: colors.surface,
+    borderRadius: radius.lg,
+    padding: spacing.lg,
+    ...shadows.card,
+    marginBottom: spacing.base,
   },
   reportHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
-    marginBottom: 12,
+    gap: spacing.sm,
+    marginBottom: spacing.md,
   },
-  reportHeaderIcon: {
-    fontSize: 18,
+  reportHeaderIconWrap: {
+    width: 32,
+    height: 32,
+    borderRadius: radius.sm,
+    backgroundColor: '#EFF6FF',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   reportHeaderText: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#1E293B',
+    ...typography.bodyBold,
+    color: colors.text.primary,
   },
   divider: {
     height: 1,
-    backgroundColor: '#E2E8F0',
-    marginBottom: 14,
+    backgroundColor: colors.border,
+    marginBottom: spacing.sm,
   },
-  reportRow: {
+  reportValueRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingVertical: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#F1F5F9',
-  },
-  reportLabel: {
-    fontSize: 14,
-    color: '#64748B',
+    alignItems: 'center',
   },
   reportValue: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#1E293B',
-  },
-  valueGreen: {
-    color: '#10B981',
-  },
-  valueRed: {
-    color: '#EF4444',
+    ...typography.smallBold,
+    color: colors.text.primary,
   },
   transmitBanner: {
     width: '100%',
     backgroundColor: '#EFF6FF',
-    borderRadius: 14,
-    padding: 16,
+    borderRadius: radius.lg,
+    padding: spacing.base,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    gap: spacing.md,
     borderWidth: 1.5,
     borderColor: '#BFDBFE',
-    marginBottom: 16,
+    marginBottom: spacing.base,
   },
-  transmitIcon: {
-    fontSize: 26,
+  transmitIconWrap: {
+    width: 44,
+    height: 44,
+    borderRadius: radius.full,
+    backgroundColor: 'rgba(29,78,216,0.1)',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   transmitTextArea: {
     flex: 1,
   },
   transmitTitle: {
-    fontSize: 14,
-    fontWeight: '700',
+    ...typography.smallBold,
     color: '#1D4ED8',
     marginBottom: 3,
   },
   transmitSub: {
-    fontSize: 12,
+    ...typography.caption,
     color: '#3B82F6',
     lineHeight: 18,
   },
-  doctorConfirmCard: {
+  doctorCard: {
     width: '100%',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 14,
-    padding: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 3,
-    marginBottom: 24,
-  },
-  doctorRow: {
+    backgroundColor: colors.surface,
+    borderRadius: radius.lg,
+    padding: spacing.base,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    gap: spacing.md,
+    ...shadows.card,
+    marginBottom: spacing.xl,
   },
-  doctorAvatar: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+  doctorAvatarWrap: {
+    width: 46,
+    height: 46,
+    borderRadius: radius.full,
     backgroundColor: '#EFF6FF',
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  doctorAvatarText: {
-    fontSize: 22,
   },
   doctorInfo: {
     flex: 1,
   },
   doctorName: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: '#1E293B',
+    ...typography.bodyBold,
+    color: colors.text.primary,
+  },
+  doctorStatusRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 3,
   },
   doctorStatus: {
-    fontSize: 12,
-    color: '#10B981',
-    marginTop: 3,
+    ...typography.caption,
+    color: colors.status.success,
   },
   homeButton: {
     width: '100%',
-    backgroundColor: '#2563EB',
-    borderRadius: 14,
-    padding: 18,
+    borderRadius: radius.lg,
+    height: 64,
+    paddingHorizontal: spacing.xl,
+    flexDirection: 'row',
     alignItems: 'center',
-    shadowColor: '#2563EB',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.25,
-    shadowRadius: 8,
-    elevation: 5,
+    justifyContent: 'center',
+    gap: spacing.sm,
+    ...shadows.button,
+    minWidth: 280,
   },
   homeButtonText: {
-    fontSize: 17,
-    fontWeight: '700',
-    color: '#FFFFFF',
+    ...typography.h3,
+    color: colors.text.white,
   },
 });

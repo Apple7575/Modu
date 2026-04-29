@@ -1,19 +1,24 @@
-import React, {useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {
   View,
   Text,
   TouchableOpacity,
   StyleSheet,
   SafeAreaView,
+  ScrollView,
   Animated,
-  Easing,
 } from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Sound from 'react-native-sound';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {RouteProp} from '@react-navigation/native';
 import {RootStackParamList} from '../navigation/AppNavigator';
+import AudioWaveform from '../components/AudioWaveform';
+import {colors, shadows, spacing, radius, typography} from '../theme';
 
 Sound.setCategory('Playback');
+
+type ChatMsg = {id: string; type: 'ai' | 'user'; text: string};
 
 type Props = {
   navigation: StackNavigationProp<RootStackParamList, 'HealthCheck'>;
@@ -21,83 +26,100 @@ type Props = {
 };
 
 const HEALTH_OPTIONS = [
-  {id: 'good', emoji: '😊', label: '괜찮아요', color: '#10B981'},
-  {id: 'pain', emoji: '🤕', label: '통증이 있어요', color: '#EF4444'},
-  {id: 'tired', emoji: '😴', label: '피로해요', color: '#F59E0B'},
-  {id: 'dizzy', emoji: '🤢', label: '어지러워요', color: '#8B5CF6'},
+  {id: 'good', icon: 'emoticon-happy-outline', label: '괜찮아요', color: colors.status.success, bg: '#ECFDF5'},
+  {id: 'pain', icon: 'emoticon-sick-outline', label: '통증이 있어요', color: colors.status.error, bg: '#FEF2F2'},
+  {id: 'tired', icon: 'sleep', label: '피로해요', color: colors.status.orange, bg: '#FFF7ED'},
+  {id: 'dizzy', icon: 'emoticon-confused-outline', label: '어지러워요', color: colors.status.purple, bg: '#F5F3FF'},
 ];
 
 export default function HealthCheckScreen({navigation, route}: Props) {
   const {tookMedicine} = route.params;
+  const [isPlaying, setIsPlaying] = useState(true);
   const [selected, setSelected] = useState<string | null>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const pulseAnim = useRef(new Animated.Value(1)).current;
-  const pulseAnim2 = useRef(new Animated.Value(1)).current;
+  const [messages, setMessages] = useState<ChatMsg[]>([
+    {id: '0', type: 'ai', text: '오늘 몸 상태는 어떠신가요?'},
+  ]);
 
-  const startPulse = () => {
-    const createPulse = (anim: Animated.Value, delay: number) =>
-      Animated.loop(
-        Animated.sequence([
-          Animated.delay(delay),
-          Animated.timing(anim, {
-            toValue: 1.35,
-            duration: 600,
-            easing: Easing.ease,
-            useNativeDriver: true,
-          }),
-          Animated.timing(anim, {
-            toValue: 1,
-            duration: 600,
-            easing: Easing.ease,
-            useNativeDriver: true,
-          }),
-        ]),
-      );
-    createPulse(pulseAnim, 0).start();
-    createPulse(pulseAnim2, 300).start();
+  const mountedRef = useRef(true);
+  const soundRef = useRef<Sound | null>(null);
+  const timersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
+  const scrollRef = useRef<ScrollView>(null);
+  const gridFade = useRef(new Animated.Value(0)).current;
+
+  const addTimer = (fn: () => void, ms: number) => {
+    const id = setTimeout(fn, ms);
+    timersRef.current.push(id);
+    return id;
   };
 
-  const stopPulse = () => {
-    pulseAnim.stopAnimation(() => pulseAnim.setValue(1));
-    pulseAnim2.stopAnimation(() => pulseAnim2.setValue(1));
+  const scrollBottom = () => {
+    addTimer(() => scrollRef.current?.scrollToEnd({animated: true}), 80);
+  };
+
+  const pushMessage = (msg: Omit<ChatMsg, 'id'>) => {
+    setMessages(prev => [...prev, {id: String(Date.now() + Math.random()), ...msg}]);
+    scrollBottom();
   };
 
   const playSound = (filename: string, onDone?: () => void) => {
     const sound = new Sound(filename, Sound.MAIN_BUNDLE, err => {
       if (err) {
         console.log('Sound error:', err);
-        onDone && onDone();
+        if (mountedRef.current) {
+          setIsPlaying(false);
+          // Show grid even if audio fails
+          Animated.timing(gridFade, {toValue: 1, duration: 350, useNativeDriver: true}).start();
+        }
         return;
       }
+      soundRef.current = sound;
       sound.play(() => {
         sound.release();
-        onDone && onDone();
+        soundRef.current = null;
+        if (mountedRef.current) onDone?.();
       });
     });
   };
 
+  useEffect(() => {
+    // Play health check question audio, then show grid
+    playSound('voice4.mp3', () => {
+      if (!mountedRef.current) return;
+      setIsPlaying(false);
+      Animated.timing(gridFade, {toValue: 1, duration: 350, useNativeDriver: true}).start();
+    });
+
+    return () => {
+      mountedRef.current = false;
+      soundRef.current?.stop();
+      soundRef.current?.release();
+      timersRef.current.forEach(clearTimeout);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const handleSelect = (optionId: string, label: string) => {
     if (selected) return;
     setSelected(optionId);
+
+    // Fade out grid
+    Animated.timing(gridFade, {toValue: 0, duration: 200, useNativeDriver: true}).start();
+
+    pushMessage({type: 'user', text: label});
     setIsPlaying(true);
-    startPulse();
-    // 4.mp3 (사용자 응답) 재생
-    playSound('voice4.mp3', () => {
-      setTimeout(() => {
-        // 5.mp3 (AI 완료 메시지) 재생
-        playSound('voice5.mp3', () => {
-          stopPulse();
-          setIsPlaying(false);
-          setTimeout(() => {
-            navigation.navigate('Completion', {
-              tookMedicine,
-              healthStatus: label,
-            });
-          }, 500);
-        });
-      }, 800);
+
+    playSound('voice5.mp3', () => {
+      if (!mountedRef.current) return;
+      setIsPlaying(false);
+      pushMessage({type: 'ai', text: '말씀해주신 내용은 기록되었습니다.\n해당 내용은 진료 시 참고될 수 있습니다.'});
+      addTimer(() => {
+        if (!mountedRef.current) return;
+        navigation.navigate('Completion', {tookMedicine, healthStatus: label});
+      }, 1400);
     });
   };
+
+  const statusText = isPlaying ? 'AI가 말하는 중...' : selected ? '' : '상태를 선택해주세요';
 
   return (
     <SafeAreaView style={styles.container}>
@@ -106,75 +128,61 @@ export default function HealthCheckScreen({navigation, route}: Props) {
         <TouchableOpacity
           style={styles.backBtn}
           onPress={() => navigation.goBack()}>
-          <Text style={styles.backBtnText}>‹</Text>
+          <Icon name="chevron-left" size={28} color={colors.primary} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>건강 상태 확인</Text>
         <View style={styles.backBtn} />
       </View>
 
-      <View style={styles.body}>
-        {/* AI 아이콘 */}
-        <View style={styles.voiceCircleContainer}>
-          {isPlaying && (
-            <>
-              <Animated.View
-                style={[styles.pulseRing, {transform: [{scale: pulseAnim2}]}]}
-              />
-            </>
-          )}
-          <Animated.View
-            style={[
-              styles.voiceCircle,
-              isPlaying && {transform: [{scale: pulseAnim}]},
-            ]}>
-            <Text style={styles.voiceIcon}>🤖</Text>
-          </Animated.View>
-        </View>
+      {/* 이퀄라이저 섹션 */}
+      <View style={styles.equalizerSection}>
+        <View style={styles.equalizerGlow} />
+        <AudioWaveform isPlaying={isPlaying} size="lg" />
+        <Text style={styles.statusLabel}>{statusText}</Text>
+      </View>
 
-        {isPlaying && (
-          <Text style={styles.playingLabel}>AI가 말하는 중...</Text>
+      {/* 채팅 + 선택지 영역 */}
+      <ScrollView
+        ref={scrollRef}
+        style={styles.chatArea}
+        contentContainerStyle={styles.chatContent}
+        showsVerticalScrollIndicator={false}>
+        {messages.map(msg =>
+          msg.type === 'ai' ? (
+            <View key={msg.id} style={styles.aiBubbleWrap}>
+              <View style={styles.aiBubble}>
+                <Text style={styles.aiBubbleText}>{msg.text}</Text>
+              </View>
+            </View>
+          ) : (
+            <View key={msg.id} style={styles.userBubbleWrap}>
+              <View style={styles.userBubble}>
+                <Text style={styles.userBubbleText}>{msg.text}</Text>
+              </View>
+            </View>
+          ),
         )}
 
-        {/* 질문 말풍선 */}
-        <View style={styles.messageBubble}>
-          <Text style={styles.messageText}>오늘 몸 상태는 어떠신가요?</Text>
-        </View>
-
-        {/* 건강 상태 선택 버튼 */}
+        {/* 건강 상태 선택 그리드 */}
         {!selected && (
-          <View style={styles.optionsGrid}>
+          <Animated.View style={[styles.optionsGrid, {opacity: gridFade}]}>
             {HEALTH_OPTIONS.map(opt => (
               <TouchableOpacity
                 key={opt.id}
-                style={styles.optionCard}
+                activeOpacity={0.8}
+                style={[styles.optionCard, {borderColor: opt.color + '50'}]}
                 onPress={() => handleSelect(opt.id, opt.label)}>
-                <Text style={styles.optionEmoji}>{opt.emoji}</Text>
-                <Text style={styles.optionLabel}>{opt.label}</Text>
+                <View style={[styles.optionIconWrap, {backgroundColor: opt.bg}]}>
+                  <Icon name={opt.icon} size={32} color={opt.color} />
+                </View>
+                <Text style={[styles.optionLabel, {color: opt.color}]}>
+                  {opt.label}
+                </Text>
               </TouchableOpacity>
             ))}
-          </View>
+          </Animated.View>
         )}
-
-        {/* 선택 후 표시 */}
-        {selected && (
-          <View style={styles.selectedArea}>
-            <View style={styles.userBubble}>
-              <Text style={styles.userBubbleText}>
-                {HEALTH_OPTIONS.find(o => o.id === selected)?.emoji}{' '}
-                {HEALTH_OPTIONS.find(o => o.id === selected)?.label}
-              </Text>
-            </View>
-            {!isPlaying && (
-              <View style={styles.aiBubble}>
-                <Text style={styles.aiBubbleText}>
-                  말씀해주신 내용은 기록되었습니다.{'\n'}해당 내용은 진료 시
-                  참고될 수 있습니다.
-                </Text>
-              </View>
-            )}
-          </View>
-        )}
-      </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -182,156 +190,117 @@ export default function HealthCheckScreen({navigation, route}: Props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8FAFC',
+    backgroundColor: colors.background,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    backgroundColor: '#FFFFFF',
+    paddingHorizontal: spacing.base,
+    paddingVertical: spacing.md,
+    backgroundColor: colors.surface,
     borderBottomWidth: 1,
-    borderBottomColor: '#E2E8F0',
+    borderBottomColor: colors.border,
+    ...shadows.card,
   },
   backBtn: {
-    width: 36,
-    height: 36,
+    width: 40,
+    height: 40,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  backBtnText: {
-    fontSize: 28,
-    color: '#2563EB',
-    fontWeight: '300',
   },
   headerTitle: {
-    fontSize: 17,
-    fontWeight: '600',
-    color: '#1E293B',
+    ...typography.h3,
+    color: colors.text.primary,
   },
-  body: {
-    flex: 1,
+  equalizerSection: {
     alignItems: 'center',
-    paddingTop: 30,
-    paddingHorizontal: 24,
+    paddingVertical: spacing.xl,
+    backgroundColor: colors.surface,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
   },
-  voiceCircleContainer: {
-    width: 120,
-    height: 120,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 16,
-  },
-  pulseRing: {
+  equalizerGlow: {
     position: 'absolute',
-    width: 110,
-    height: 110,
-    borderRadius: 55,
-    backgroundColor: 'rgba(37, 99, 235, 0.1)',
+    width: 180,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: 'rgba(29, 78, 216, 0.07)',
+    top: spacing.lg,
   },
-  voiceCircle: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: '#2563EB',
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: '#2563EB',
-    shadowOffset: {width: 0, height: 4},
-    shadowOpacity: 0.35,
-    shadowRadius: 8,
-    elevation: 8,
+  statusLabel: {
+    ...typography.small,
+    color: colors.text.secondary,
+    marginTop: spacing.md,
+    letterSpacing: 0.3,
+    minHeight: 18,
   },
-  voiceIcon: {
-    fontSize: 36,
+  chatArea: {
+    flex: 1,
   },
-  playingLabel: {
-    fontSize: 13,
-    color: '#64748B',
-    marginBottom: 12,
+  chatContent: {
+    paddingHorizontal: spacing.base,
+    paddingTop: spacing.base,
+    paddingBottom: spacing.lg,
+    gap: spacing.md,
   },
-  messageBubble: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 16,
-    borderTopLeftRadius: 4,
-    padding: 18,
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 3,
-    maxWidth: '90%',
-    marginBottom: 28,
+  aiBubbleWrap: {
+    alignItems: 'flex-start',
   },
-  messageText: {
-    fontSize: 18,
-    color: '#1E293B',
-    fontWeight: '600',
-    textAlign: 'center',
+  aiBubble: {
+    backgroundColor: colors.surface,
+    borderRadius: radius.lg,
+    borderTopLeftRadius: radius.xs,
+    padding: spacing.base,
+    maxWidth: '80%',
+    ...shadows.card,
+  },
+  aiBubbleText: {
+    ...typography.body,
+    color: colors.text.primary,
+    lineHeight: 24,
+  },
+  userBubbleWrap: {
+    alignItems: 'flex-end',
+  },
+  userBubble: {
+    backgroundColor: colors.primary,
+    borderRadius: radius.lg,
+    borderTopRightRadius: radius.xs,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
+    maxWidth: '70%',
+  },
+  userBubbleText: {
+    ...typography.bodyBold,
+    color: colors.text.white,
   },
   optionsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 12,
-    width: '100%',
+    gap: spacing.md,
+    marginTop: spacing.sm,
   },
   optionCard: {
     width: '47%',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 14,
-    padding: 20,
+    backgroundColor: colors.surface,
+    borderRadius: radius.lg,
+    padding: spacing.lg,
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 3,
+    gap: spacing.sm,
+    ...shadows.card,
     borderWidth: 1.5,
-    borderColor: '#E2E8F0',
   },
-  optionEmoji: {
-    fontSize: 32,
-    marginBottom: 8,
+  optionIconWrap: {
+    width: 60,
+    height: 60,
+    borderRadius: radius.full,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: spacing.xs,
   },
   optionLabel: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#334155',
+    ...typography.smallBold,
     textAlign: 'center',
-  },
-  selectedArea: {
-    width: '100%',
-    gap: 12,
-  },
-  userBubble: {
-    backgroundColor: '#2563EB',
-    borderRadius: 16,
-    borderTopRightRadius: 4,
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    alignSelf: 'flex-end',
-  },
-  userBubbleText: {
-    fontSize: 15,
-    color: '#FFFFFF',
-    fontWeight: '500',
-  },
-  aiBubble: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 16,
-    borderTopLeftRadius: 4,
-    padding: 16,
-    alignSelf: 'flex-start',
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
-    shadowOpacity: 0.06,
-    shadowRadius: 6,
-    elevation: 3,
-  },
-  aiBubbleText: {
-    fontSize: 14,
-    color: '#334155',
-    lineHeight: 22,
   },
 });

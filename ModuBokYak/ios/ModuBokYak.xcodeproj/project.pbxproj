@@ -16,8 +16,8 @@
 		897E056F783F4A448E5C2C89 /* voice5.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 490B172A85564AFC9EA9246F /* voice5.mp3 */; };
 		9575D4B697937668BA3A5BDB /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */; };
 		EE45539B0A3A4575B9E1566B /* voice2.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = AA3B366F2C4E4E21AFD37E12 /* voice2.mp3 */; };
-		FE2F1C90A1A245DFAB3A7A0B /* voice3.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 067C1E0A199B4A29B2C36579 /* voice3.mp3 */; };
 		F53BF96069A64C9696C395CE /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C1155B63510F4E4DB8EE1ABD /* AVFoundation.framework */; };
+		FE2F1C90A1A245DFAB3A7A0B /* voice3.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 067C1E0A199B4A29B2C36579 /* voice3.mp3 */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -35,8 +35,8 @@
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = ModuBokYak/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		9D413CA264494F158D1FF723 /* voice4.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = voice4.mp3; path = ModuBokYak/voice4.mp3; sourceTree = "<group>"; };
 		AA3B366F2C4E4E21AFD37E12 /* voice2.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = voice2.mp3; path = ModuBokYak/voice2.mp3; sourceTree = "<group>"; };
-		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		C1155B63510F4E4DB8EE1ABD /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
+		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
