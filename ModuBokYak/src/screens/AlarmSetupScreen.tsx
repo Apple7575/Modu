@@ -121,52 +121,52 @@ export default function AlarmSetupScreen({ navigation }: Props) {
         if (!mountedRef.current) return;
         pushMsg({ type: 'user_listening', text: '아침, 점심, 저녁 약이 있어~' });
 
-        addTimer(() => {
+        playSound('alarm_user1.mp3', () => {
           if (!mountedRef.current) return;
           pushMsg({ type: 'user_listening', text: '시간은… 오전 7시 반, 정오, 오후 6시로 설정해줘.' });
 
-          addTimer(() => {
+          playSound('alarm_user2.mp3', () => {
             if (!mountedRef.current) return;
-            setStage('alarm_set');
-            setIsPlaying(true);
 
-            // AI 응답 메시지
-            pushMsg({
-              type: 'ai',
-              text: '네, 오전 7시 30분, 정오, 오후 6시로\n하루 3회 복용 알람이 설정되었습니다.',
-            });
-
-            playSound('alarm_voice2.mp3', () => {
+            addTimer(() => {
               if (!mountedRef.current) return;
+              setStage('alarm_set');
+              setIsPlaying(true);
 
-              // AI 응답 직후 알람 카드 삽입
-              addTimer(() => {
+              pushMsg({
+                type: 'ai',
+                text: '네, 오전 7시 30분, 정오, 오후 6시로\n하루 3회 복용 알람이 설정되었습니다.',
+              });
+
+              playSound('alarm_voice2.mp3', () => {
                 if (!mountedRef.current) return;
-                pushMsg({ type: 'alarm_card', text: '' });
 
-                // 잠시 후 알람 방식 안내 메시지 + 옵션 카드
                 addTimer(() => {
                   if (!mountedRef.current) return;
-                  setStage('pick_alarm');
-                  setIsPlaying(true);
-                  pushMsg({ type: 'ai', text: '알람 방식을 선택해주세요.' });
+                  pushMsg({ type: 'alarm_card', text: '' });
 
-                  playSound('alarm_voice3.mp3', () => {
-                    if (!mountedRef.current) return;
-                    setIsPlaying(false);
-                  });
-
-                  // 옵션 카드는 AI 메시지 직후 삽입
                   addTimer(() => {
                     if (!mountedRef.current) return;
-                    pushMsg({ type: 'alarm_options', text: '' });
-                    scrollBottom();
-                  }, 300);
-                }, 600);
-              }, 400);
-            });
-          }, 1200);
-        }, 2000);
+                    setStage('pick_alarm');
+                    setIsPlaying(true);
+                    pushMsg({ type: 'ai', text: '알람 방식을 선택해주세요.' });
+
+                    playSound('alarm_voice3.mp3', () => {
+                      if (!mountedRef.current) return;
+                      setIsPlaying(false);
+                    });
+
+                    addTimer(() => {
+                      if (!mountedRef.current) return;
+                      pushMsg({ type: 'alarm_options', text: '' });
+                      scrollBottom();
+                    }, 300);
+                  }, 600);
+                }, 400);
+              });
+            }, 1200);
+          });
+        });
       }, 800);
     });
 
@@ -184,29 +184,33 @@ export default function AlarmSetupScreen({ navigation }: Props) {
     setSelectedAlarm(opt.id);
     pushMsg({ type: 'user_listening', text: opt.id === 'music' ? '1번으로 할게.' : '2번으로 할게.' });
     setStage('confirm');
-    setIsPlaying(true);
 
     const confirmText =
       opt.id === 'music'
         ? '네, 음악 알람과 음성 안내형으로 설정되었습니다.\n\n설정된 시간에 복약 안내를 드리겠습니다.'
         : '네, 진동과 음성 안내형으로 설정되었습니다.\n\n설정된 시간에 복약 안내를 드리겠습니다.';
 
-    addTimer(() => {
+    playSound('alarm_user3.mp3', () => {
       if (!mountedRef.current) return;
-      pushMsg({ type: 'ai', text: confirmText });
+      setIsPlaying(true);
 
-      playSound('alarm_voice4.mp3', () => {
+      addTimer(() => {
         if (!mountedRef.current) return;
-        setIsPlaying(false);
-        setStage('done');
-        pushMsg({ type: 'done_banner', text: '' });
-        scrollBottom();
-        addTimer(() => {
+        pushMsg({ type: 'ai', text: confirmText });
+
+        playSound('alarm_voice4.mp3', () => {
           if (!mountedRef.current) return;
-          navigation.goBack();
-        }, 2000);
-      });
-    }, 400);
+          setIsPlaying(false);
+          setStage('done');
+          pushMsg({ type: 'done_banner', text: '' });
+          scrollBottom();
+          addTimer(() => {
+            if (!mountedRef.current) return;
+            navigation.goBack();
+          }, 2000);
+        });
+      }, 400);
+    });
   };
 
   const statusText = isPlaying

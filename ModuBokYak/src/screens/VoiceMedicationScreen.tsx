@@ -179,7 +179,7 @@ export default function VoiceMedicationScreen({ navigation }: Props) {
       addTimer(() => {
         if (!mountedRef.current) return;
         // voice5 시작과 동시에 AI 마무리 메시지 표시
-        pushMsg({ type: 'ai', text: '말씀해주신 내용은 기록되었습니다.\n담당 의사 선생님께 전달하겠습니다.' });
+        pushMsg({ type: 'ai', text: '말씀해주신 내용은 기록되었습니다.\n해당 내용은 진료시 참고 될 수 있습니다.' });
         playSound('voice5.mp3', () => {
           if (!mountedRef.current) return;
           setIsPlaying(false);

@@ -16,6 +16,9 @@
 		AA001100BB22CC33DD44EE57 /* alarm_voice2.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = AA001100BB22CC33DD44EE58 /* alarm_voice2.mp3 */; };
 		AA001100BB22CC33DD44EE59 /* alarm_voice3.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = AA001100BB22CC33DD44EE5A /* alarm_voice3.mp3 */; };
 		AA001100BB22CC33DD44EE5B /* alarm_voice4.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = AA001100BB22CC33DD44EE5C /* alarm_voice4.mp3 */; };
+		CC001100DD22EE33FF4400A1 /* alarm_user1.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = CC001100DD22EE33FF4400A2 /* alarm_user1.mp3 */; };
+		CC001100DD22EE33FF4400A3 /* alarm_user2.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = CC001100DD22EE33FF4400A4 /* alarm_user2.mp3 */; };
+		CC001100DD22EE33FF4400A5 /* alarm_user3.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = CC001100DD22EE33FF4400A6 /* alarm_user3.mp3 */; };
 		761780ED2CA45674006654EE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 761780EC2CA45674006654EE /* AppDelegate.swift */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 		897E056F783F4A448E5C2C89 /* voice5.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 490B172A85564AFC9EA9246F /* voice5.mp3 */; };
@@ -32,6 +35,9 @@
 		AA001100BB22CC33DD44EE58 /* alarm_voice2.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = alarm_voice2.mp3; path = ModuBokYak/alarm_voice2.mp3; sourceTree = "<group>"; };
 		AA001100BB22CC33DD44EE5A /* alarm_voice3.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = alarm_voice3.mp3; path = ModuBokYak/alarm_voice3.mp3; sourceTree = "<group>"; };
 		AA001100BB22CC33DD44EE5C /* alarm_voice4.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = alarm_voice4.mp3; path = ModuBokYak/alarm_voice4.mp3; sourceTree = "<group>"; };
+		CC001100DD22EE33FF4400A2 /* alarm_user1.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = alarm_user1.mp3; path = ModuBokYak/alarm_user1.mp3; sourceTree = "<group>"; };
+		CC001100DD22EE33FF4400A4 /* alarm_user2.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = alarm_user2.mp3; path = ModuBokYak/alarm_user2.mp3; sourceTree = "<group>"; };
+		CC001100DD22EE33FF4400A6 /* alarm_user3.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = alarm_user3.mp3; path = ModuBokYak/alarm_user3.mp3; sourceTree = "<group>"; };
 		13B07F961A680F5B00A75B9A /* ModuBokYak.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ModuBokYak.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = ModuBokYak/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = ModuBokYak/Info.plist; sourceTree = "<group>"; };
@@ -80,6 +86,9 @@
 				AA001100BB22CC33DD44EE58 /* alarm_voice2.mp3 */,
 				AA001100BB22CC33DD44EE5A /* alarm_voice3.mp3 */,
 				AA001100BB22CC33DD44EE5C /* alarm_voice4.mp3 */,
+				CC001100DD22EE33FF4400A2 /* alarm_user1.mp3 */,
+				CC001100DD22EE33FF4400A4 /* alarm_user2.mp3 */,
+				CC001100DD22EE33FF4400A6 /* alarm_user3.mp3 */,
 			);
 			name = ModuBokYak;
 			sourceTree = "<group>";
@@ -203,6 +212,9 @@
 				AA001100BB22CC33DD44EE57 /* alarm_voice2.mp3 in Resources */,
 				AA001100BB22CC33DD44EE59 /* alarm_voice3.mp3 in Resources */,
 				AA001100BB22CC33DD44EE5B /* alarm_voice4.mp3 in Resources */,
+				CC001100DD22EE33FF4400A1 /* alarm_user1.mp3 in Resources */,
+				CC001100DD22EE33FF4400A3 /* alarm_user2.mp3 in Resources */,
+				CC001100DD22EE33FF4400A5 /* alarm_user3.mp3 in Resources */,
 				9575D4B697937668BA3A5BDB /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
