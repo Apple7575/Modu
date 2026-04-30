@@ -14,6 +14,7 @@ import {StackNavigationProp} from '@react-navigation/stack';
 import {RootStackParamList} from '../navigation/AppNavigator';
 import {colors, shadows, spacing, radius, typography} from '../theme';
 import CircularProgress from '../components/CircularProgress';
+import {bgmManager} from '../utils/bgmManager';
 
 type Props = {
   navigation: StackNavigationProp<RootStackParamList, 'Home'>;
@@ -92,7 +93,7 @@ export default function HomeScreen({navigation}: Props) {
         {/* 시작 버튼 */}
         <TouchableOpacity
           activeOpacity={0.85}
-          onPress={() => navigation.navigate('VoiceMedication')}>
+          onPress={() => { bgmManager.play(); navigation.navigate('VoiceMedication'); }}>
           <LinearGradient
             colors={[colors.primary, colors.primaryLight]}
             start={{x: 0, y: 0}}

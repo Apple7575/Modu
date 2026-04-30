@@ -17,6 +17,7 @@ import AudioWaveform from '../components/AudioWaveform';
 import TypingBubble from '../components/TypingBubble';
 import UserListeningBubble from '../components/UserListeningBubble';
 import { colors, shadows, spacing, radius, typography } from '../theme';
+import { bgmManager } from '../utils/bgmManager';
 
 Sound.setCategory('Playback');
 
@@ -121,12 +122,14 @@ export default function VoiceMedicationScreen({ navigation }: Props) {
       soundRef.current?.stop();
       soundRef.current?.release();
       timersRef.current.forEach(clearTimeout);
+      bgmManager.stop();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // ── 복약 완료 ────────────────────────────────────────
   const handleTookMedicine = () => {
+    bgmManager.stop();
     setTookMedicine(true);
     hideFooter(() => {
       if (!mountedRef.current) return;
@@ -154,6 +157,7 @@ export default function VoiceMedicationScreen({ navigation }: Props) {
 
   // ── 복약 미완료 ──────────────────────────────────────
   const handleNotTook = () => {
+    bgmManager.stop();
     setTookMedicine(false);
     hideFooter(() => {
       if (!mountedRef.current) return;
