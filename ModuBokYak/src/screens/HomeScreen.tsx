@@ -124,6 +124,23 @@ export default function HomeScreen({navigation}: Props) {
           </LinearGradient>
         </TouchableOpacity>
 
+        {/* 의료진 대시보드 버튼 */}
+        <TouchableOpacity
+          activeOpacity={0.85}
+          onPress={() => navigation.navigate('MedicalDashboard')}>
+          <LinearGradient
+            colors={[colors.primaryDark, colors.primary]}
+            start={{x: 0, y: 0}}
+            end={{x: 1, y: 0}}
+            style={styles.startButton}>
+            <Icon name="chart-bar" size={24} color={colors.text.white} />
+            <Text style={styles.startButtonText} numberOfLines={1}>
+              의료진 대시보드
+            </Text>
+            <Icon name="chevron-right" size={22} color="rgba(255,255,255,0.7)" />
+          </LinearGradient>
+        </TouchableOpacity>
+
         <Text style={styles.hint}>
           AI가 음성으로 복약을 안내하고 건강 상태를 기록합니다
         </Text>

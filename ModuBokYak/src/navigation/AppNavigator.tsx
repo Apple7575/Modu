@@ -6,6 +6,7 @@ import VoiceMedicationScreen from '../screens/VoiceMedicationScreen';
 import HealthCheckScreen from '../screens/HealthCheckScreen';
 import CompletionScreen from '../screens/CompletionScreen';
 import AlarmSetupScreen from '../screens/AlarmSetupScreen';
+import MedicalDashboardScreen from '../screens/MedicalDashboardScreen';
 
 export type RootStackParamList = {
   Home: undefined;
@@ -13,6 +14,7 @@ export type RootStackParamList = {
   HealthCheck: {tookMedicine: boolean};
   Completion: {tookMedicine: boolean; healthStatus: string};
   AlarmSetup: undefined;
+  MedicalDashboard: undefined;
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -26,6 +28,7 @@ export default function AppNavigator() {
         <Stack.Screen name="HealthCheck" component={HealthCheckScreen} />
         <Stack.Screen name="Completion" component={CompletionScreen} />
         <Stack.Screen name="AlarmSetup" component={AlarmSetupScreen} />
+        <Stack.Screen name="MedicalDashboard" component={MedicalDashboardScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
